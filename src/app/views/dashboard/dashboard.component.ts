@@ -22,21 +22,20 @@ export class DashboardComponent implements OnInit {
               private tradeControllerService: TradeControllerService) {
   }
 
-  ngOnInit(): void { 
+  ngOnInit(): void {     
+  }
+
+  onClick(event) {
     this.tradeControllerService.getAll()
       .subscribe((trades: any) => {
         this.trades = trades;
+
+        console.log (trades);
     },
     err => {
       console.log(err);
 
       this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.ERROR, title: 'Dashboard', error: err.message});
     });
-  }
-
-  onClick(event) {
-    console.log('Hello Toast');
-
-    this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.INFO, title: 'Dashboard', message: 'Hello Toast'});
   }
 }

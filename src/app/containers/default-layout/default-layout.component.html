@@ -10,16 +10,22 @@
       <a class="nav-link" href="#">Dashboard</a>
     </li>
   </ul>
+
+  <!-- main messages -->
+  <p-toast></p-toast>
 </app-header>
+
 <div class="app-body">
   <app-sidebar #appSidebar [fixed]="true" [display]="'lg'" [minimized]="sidebarMinimized" (minimizedChange)="toggleMinimize($event)">
     <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="appSidebar.minimized"></app-sidebar-nav>
     <app-sidebar-minimizer></app-sidebar-minimizer>
   </app-sidebar>
+
   <!-- Main content -->
   <main class="main">
     <!-- Breadcrumb -->
     <cui-breadcrumb></cui-breadcrumb>
+    
     <div class="container-fluid">
       <router-outlet></router-outlet>
     </div><!-- /.container-fluid -->
@@ -28,6 +34,7 @@
 
   </app-aside>
 </div>
+
 <app-footer>
   <span><a href="https://coreui.io/pro/angular/">CoreUI Pro</a> &copy; 2018 creativeLabs.</span>
   <span class="ml-auto">Powered by <a href="https://coreui.io/pro/angular">CoreUI Pro for Angular</a></span>

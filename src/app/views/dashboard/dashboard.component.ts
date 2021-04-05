@@ -1,9 +1,42 @@
 import { Component, OnInit } from '@angular/core';
 
+import { NgEventBus } from 'ng-event-bus';
+
+import { TradeControllerService } from '../../shared/backend/api/api';
+import { Trade } from '../../shared/backend/model/models';
+
+import { EventType } from '../../shared/enums/EventType.enum';
+import { EventSeverity } from '../../shared/enums/EventSeverity.enum';
+
 @Component({
-  templateUrl: 'dashboard.component.html'
+  selector: 'dashboard',
+  templateUrl: 'dashboard.component.html',
+  styleUrls: ['dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
+  public eventSeverity = EventSeverity;
+  public eventType = EventType;
+  public trades: Trade[];
 
-  ngOnInit(): void { }
+  constructor(private eventBus: NgEventBus,
+              private tradeControllerService: TradeControllerService) {
+  }
+
+  ngOnInit(): void { 
+    this.tradeControllerService.getAll()
+      .subscribe((trades: any) => {
+        this.trades = trades;
+    },
+    err => {
+      console.log(err);
+
+      this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.ERROR, title: 'Dashboard', error: err.message});
+    });
+  }
+
+  onClick(event) {
+    console.log('Hello Toast');
+
+    this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.INFO, title: 'Dashboard', message: 'Hello Toast'});
+  }
 }

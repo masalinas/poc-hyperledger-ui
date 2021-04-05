@@ -1,7 +1,8 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgModule } from '@angular/core';
-import { LocationStrategy, HashLocationStrategy } from '@angular/common';
+import { LocationStrategy, HashLocationStrategy, PathLocationStrategy } from '@angular/common';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
@@ -31,16 +32,27 @@ import {
 // Import routing module
 import { AppRoutingModule } from './app.routing';
 
+import { Configuration } from './shared/backend';
+
+// import angular envirotment variables
+import { environment } from '../environments/environment';
+
 // Import 3rd party components
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 import { ChartsModule } from 'ng2-charts';
+
+// App Components event bus
+import { NgEventBus } from 'ng-event-bus';
+
+import { ToastModule } from 'primeng/toast';
 
 @NgModule({
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
     AppRoutingModule,
+    HttpClientModule,
     AppAsideModule,
     AppBreadcrumbModule.forRoot(),
     AppFooterModule,
@@ -49,7 +61,8 @@ import { ChartsModule } from 'ng2-charts';
     PerfectScrollbarModule,
     BsDropdownModule.forRoot(),
     TabsModule.forRoot(),
-    ChartsModule
+    ChartsModule,
+    ToastModule
   ],
   declarations: [
     AppComponent,
@@ -57,8 +70,16 @@ import { ChartsModule } from 'ng2-charts';
   ],
   providers: [{
     provide: LocationStrategy,
-    useClass: HashLocationStrategy
-  }],
+    //useClass: HashLocationStrategy
+    useClass: PathLocationStrategy
+    },
+    {
+      provide: Configuration,
+      useFactory: () =>
+          new Configuration({ basePath: environment.basePath})
+    },
+    NgEventBus
+  ],
   bootstrap: [ AppComponent ]
 })
 export class AppModule { }

@@ -1,4 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+
+import { map } from 'rxjs/operators';
 
 import { NgEventBus } from 'ng-event-bus';
 
@@ -13,26 +16,122 @@ import { EventSeverity } from '../../shared/enums/EventSeverity.enum';
   templateUrl: 'dashboard.component.html',
   styleUrls: ['dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit {  
   public eventSeverity = EventSeverity;
-  public eventType = EventType;
+  public eventType = EventType;  
+  public loading: boolean;
+
   public trades: Trade[];
+  public indexTrade: number = 0;
+  public actionButton: string = "Buy";
+  public actionColor: string = "Green";
+  public tradesBuy: Trade[];
+  public tradesSell: Trade[];
+
+  public tradeSellFormGroup = this.fb.group({
+    owner: [''],
+    tradeType: [''],
+    value: [''],
+    price: ['']
+  });
+
+  public tradeBuyFormGroup = this.fb.group({
+    owner: [''],
+    tradeType: [''],
+    value: [''],
+    price: ['']
+  });
 
   constructor(private eventBus: NgEventBus,
+              private fb: FormBuilder,
               private tradeControllerService: TradeControllerService) {
   }
 
-  ngOnInit(): void {     
-  }
+  private getTrades() {
+    this.loading = true;
 
-  onClick(event) {
-    this.tradeControllerService.getAll()
-      .subscribe((trades: any) => {
-        this.trades = trades;
+    this.tradeControllerService.getAll().pipe(map((datum) => datum.map((trade: any) => {
+      if (trade.creationDate != undefined)
+        trade.creationDate = new Date(trade.creationDate);
 
-        console.log (trades);
+      return trade;
+    }))).subscribe((trades: any) => {
+      this.loading = false;
+      
+      this.trades = trades;
+
+      console.log (trades);
+      
+      this.tradesSell = this.trades.filter(trade => trade.tradeType === 'Sell');
+      this.tradesSell.sort((a, b) => {
+          let priceA = a.price;
+          let priceB = b.price;
+
+          return priceA - priceB
+      });
+
+      this.tradesBuy = this.trades.filter(trade => trade.tradeType === 'Buy'); 
+      this.tradesBuy.sort((a, b) => {
+        let priceA = a.price;
+        let priceB = b.price;
+
+        return priceB - priceA
+    });
     },
     err => {
+      this.loading = false;
+
+      console.log(err);
+
+      this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.ERROR, title: 'Dashboard', error: err.message});
+    });
+  }
+
+  ngOnInit(): void {   
+    this.getTrades();  
+  }
+
+  public onGetTradesClick(event: any) {
+    this.getTrades();
+  }
+
+  public onTabTradeChange(event: any) {
+    if (this.indexTrade === 0)
+      this.actionButton = "Buy";    
+    else
+      this.actionButton = "Sell";    
+  }
+
+  public onExecuteTradeClick(event: any) {
+    let trade: any
+
+    // create trade
+    if (this.indexTrade === 0) {
+      trade = this.tradeBuyFormGroup.value;    
+      trade.tradeType = "Buy";
+    }
+    else {
+      trade = this.tradeSellFormGroup.value;
+      trade.tradeType = "Sell";
+    }
+      
+    console.log(trade);
+
+    // save new trade
+    this.loading = true;
+
+    this.tradeControllerService.create(trade)
+    .subscribe((result: any) => {
+      this.loading = false;
+      
+      // refresh trades
+      this.getTrades();
+
+      this.tradeBuyFormGroup.setValue(null);
+    },
+    err => {
+      this.loading = false;
+
       console.log(err);
 
       this.eventBus.cast(this.eventType.MESSAGE, {severity: this.eventSeverity.ERROR, title: 'Dashboard', error: err.message});

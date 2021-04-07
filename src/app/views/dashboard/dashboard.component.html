@@ -1,1 +1,119 @@
-<p-button label="Submit" (click)="onClick($event)"></p-button>
+<p-button label="Get Trades" (click)="onGetTradesClick($event)"></p-button>
+
+<div class="p-d-flex">
+    <div class="p-d-flex">
+        <div class="p-md-6 list-buy">
+            <p-table [value]="tradesBuy" [loading]="loading">
+                <ng-template pTemplate="caption">
+                    Buy Energy Trades
+                </ng-template>
+
+                <ng-template pTemplate="header">                    
+                    <tr>
+                        <th>Owner</th>
+                        <th>Power [Kw]</th>
+                        <th>Date</th>                                                               
+                        <th>Price [€]</th>                         
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-trade>
+                    <tr>
+                        <td>{{trade.owner}}</td>
+                        <td>{{trade.value}}</td>
+                        <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
+                        <td>{{trade.price}}</td>                        
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+
+        <div class="p-md-6 list-sell">            
+            <p-table [value]="tradesSell" [loading]="loading">
+                <ng-template pTemplate="caption">
+                    Sell Energy Trades
+                </ng-template>
+
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>Price [€]</th>
+                        <th>Date</th>                                       
+                        <th>Power [Kw]</th>
+                        <th>Owner</th> 
+                    </tr>
+                </ng-template>
+
+                <ng-template pTemplate="body" let-trade>
+                    <tr>
+                        <td>{{trade.price}}</td>
+                        <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
+                        <td>{{trade.value}}</td>                        
+                        <td>{{trade.owner}}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+        
+    <div class="p-md-2">
+        <p-tabView styleClass="tabview-custom" [(activeIndex)]="indexTrade" (onChange)="onTabTradeChange($event)">
+            <p-tabPanel>
+                <ng-template pTemplate = "header">
+                    <span style="color: green;">Buy</span>
+                </ng-template>
+                
+                <form novalidate [formGroup]="tradeBuyFormGroup">
+                    <div class="p-fluid p-formgrid p-grid">
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="owner"><strong>Owner*</strong></label>
+                            <input id="owner" type="text" pInputText required formControlName="owner">
+                            <small [hidden]="tradeBuyFormGroup.controls.owner.valid || tradeBuyFormGroup.controls.owner.pristine" class="p-error">Owner is mandatory</small>
+                        </div>
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="power"><strong>Power [Kw]*</strong></label>
+                            <input id="power" type="number" min="0" pInputText required formControlName="value">
+                            <small [hidden]="tradeBuyFormGroup.controls.value.valid || tradeBuyFormGroup.controls.value.pristine" class="p-error">Power is mandatory</small>
+                        </div>
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="price"><strong>Price [€]*</strong></label>
+                            <input id="price" type="number" min="0" pInputText required formControlName="price">
+                            <small [hidden]="tradeBuyFormGroup.controls.price.valid || tradeBuyFormGroup.controls.price.pristine" class="p-error">Price is mandatory</small>
+                        </div>                
+                    </div>
+                </form>
+            </p-tabPanel>
+            <p-tabPanel>
+                <ng-template pTemplate = "header">                    
+                    <span style="color: red;">Sell</span>
+                </ng-template>
+
+                <form novalidate [formGroup]="tradeSellFormGroup">
+                    <div class="p-fluid p-formgrid p-grid">
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="owner"><strong>Owner*</strong></label>
+                            <input id="owner" type="text" pInputText required formControlName="owner">
+                            <small [hidden]="tradeSellFormGroup.controls.owner.valid || tradeSellFormGroup.controls.owner.pristine" class="p-error">Owner is mandatory</small>
+                        </div>
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="power"><strong>Power [Kw]*</strong></label>
+                            <input id="power" type="number" min="0" pInputText required formControlName="value">
+                            <small [hidden]="tradeSellFormGroup.controls.value.valid || tradeSellFormGroup.controls.value.pristine" class="p-error">Power is mandatory</small>
+                        </div>
+                        <div class="p-field p-col-12 p-md-12">
+                            <label for="price"><strong>Price [€]*</strong></label>
+                            <input id="price" type="number" min="0" pInputText required formControlName="price">
+                            <small [hidden]="tradeSellFormGroup.controls.price.valid || tradeSellFormGroup.controls.price.pristine" class="p-error">Price is mandatory</small>
+                        </div>                
+                    </div>
+                </form>                
+            </p-tabPanel>
+        </p-tabView>
+
+        <div class="p-d-flex action-button" >
+            <button pButton type="button" label="{{actionButton}}" 
+                    class="action-button" [ngStyle]="{'background-color' : indexTrade === 0 ? 'green' : 'red'}"
+                    [disabled]="(!tradeBuyFormGroup.valid && indexTrade == 0) || (!tradeSellFormGroup.valid && indexTrade == 1)"
+                    (click)="onExecuteTradeClick($event)"></button>            
+        </div>
+    </div>
+</div>

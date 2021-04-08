@@ -67,7 +67,7 @@ export class DashboardComponent implements OnInit {
           let priceA = a.price;
           let priceB = b.price;
 
-          return priceA - priceB
+          return priceB - priceA
       });
 
       this.tradesBuy = this.trades.filter(trade => trade.tradeType === 'Buy'); 
@@ -75,7 +75,7 @@ export class DashboardComponent implements OnInit {
         let priceA = a.price;
         let priceB = b.price;
 
-        return priceB - priceA
+        return priceA - priceB
     });
     },
     err => {

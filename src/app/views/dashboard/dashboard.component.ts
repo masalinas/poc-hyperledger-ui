@@ -62,21 +62,15 @@ export class DashboardComponent implements OnInit {
 
       console.log (trades);
       
-      this.tradesSell = this.trades.filter(trade => trade.tradeType === 'Sell');
-      this.tradesSell.sort((a, b) => {
-          let priceA = a.price;
-          let priceB = b.price;
-
-          return priceB - priceA
-      });
-
       this.tradesBuy = this.trades.filter(trade => trade.tradeType === 'Buy'); 
       this.tradesBuy.sort((a, b) => {
-        let priceA = a.price;
-        let priceB = b.price;
+        return  b.price - a.price || new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime()
+      });
 
-        return priceA - priceB
-    });
+      this.tradesSell = this.trades.filter(trade => trade.tradeType === 'Sell');
+      this.tradesSell.sort((a, b) => {
+        return  a.price - b.price || new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime()
+      });
     },
     err => {
       this.loading = false;

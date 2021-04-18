@@ -16,6 +16,8 @@ import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
+import { CardModule } from 'primeng/card';
+import { ChartModule } from 'primeng/chart';
 
 @NgModule({
   imports: [
@@ -33,6 +35,8 @@ import { DropdownModule } from 'primeng/dropdown';
     InputTextModule,
     DropdownModule,
     TableModule,
+    CardModule,
+    ChartModule
   ],
   declarations: [ DashboardComponent ]
 })

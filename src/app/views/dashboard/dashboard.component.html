@@ -1,60 +1,72 @@
 <p-button label="Get Trades" (click)="onGetTradesClick($event)"></p-button>
 
+<!-- Market Book orders -->
 <div class="p-d-flex">
     <div class="p-d-flex">
+        <!-- Market buy order list -->
         <div class="p-md-6 list-buy">
-            <p-table [value]="tradesBuy" [loading]="loading">
-                <ng-template pTemplate="caption">
-                    Buy Energy Trades
-                </ng-template>
+            <p-card header="Buy Energy Trades" >                
+            </p-card>
+            <p-card [style]="{height: '460px', overflow: 'auto'}">
+                <p-table styleClass="p-datatable-sm p-datatable-striped"
+                         [loading]="loading" 
+                         [scrollable]="true" 
+                         scrollHeight="350px"  
+                         [value]="tradesBuy" >
+                    <ng-template pTemplate="header">                    
+                        <tr>
+                            <th>Owner</th>
+                            <th>Power [Kw]</th>
+                            <th>Date</th>                                                               
+                            <th>Price [€]</th>                         
+                        </tr>
+                    </ng-template>
 
-                <ng-template pTemplate="header">                    
-                    <tr>
-                        <th>Owner</th>
-                        <th>Power [Kw]</th>
-                        <th>Date</th>                                                               
-                        <th>Price [€]</th>                         
-                    </tr>
-                </ng-template>
-
-                <ng-template pTemplate="body" let-trade>
-                    <tr>
-                        <td>{{trade.owner}}</td>
-                        <td>{{trade.value}}</td>
-                        <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
-                        <td>{{trade.price}}</td>                        
-                    </tr>
-                </ng-template>
-            </p-table>
+                    <ng-template pTemplate="body" let-trade>
+                        <tr>
+                            <td>{{trade.owner}}</td>
+                            <td>{{trade.value}}</td>
+                            <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
+                            <td>{{trade.price}}</td>                        
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
         </div>
 
-        <div class="p-md-6 list-sell">            
-            <p-table [value]="tradesSell" [loading]="loading">
-                <ng-template pTemplate="caption">
-                    Sell Energy Trades
-                </ng-template>
+        <!-- Market sell order list -->
+        <div class="p-md-6 list-sell">
+            <p-card header="Sell Energy Trades">                
+            </p-card>
+            <p-card [style]="{height: '460px', overflow: 'auto'}">
+                <p-table styleClass="p-datatable-sm p-datatable-striped"
+                         [loading]="loading" 
+                         [scrollable]="true" 
+                         scrollHeight="350px" 
+                         [value]="tradesSell">
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>Price [€]</th>
+                            <th>Date</th>                                       
+                            <th>Power [Kw]</th>
+                            <th>Owner</th> 
+                        </tr>
+                    </ng-template>
 
-                <ng-template pTemplate="header">
-                    <tr>
-                        <th>Price [€]</th>
-                        <th>Date</th>                                       
-                        <th>Power [Kw]</th>
-                        <th>Owner</th> 
-                    </tr>
-                </ng-template>
-
-                <ng-template pTemplate="body" let-trade>
-                    <tr>
-                        <td>{{trade.price}}</td>
-                        <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
-                        <td>{{trade.value}}</td>                        
-                        <td>{{trade.owner}}</td>
-                    </tr>
-                </ng-template>
-            </p-table>
+                    <ng-template pTemplate="body" let-trade>
+                        <tr>
+                            <td>{{trade.price}}</td>
+                            <td>{{trade.creationDate | date: 'dd/MM/yyyy hh:mm' }}</td>                        
+                            <td>{{trade.value}}</td>                        
+                            <td>{{trade.owner}}</td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </p-card>
         </div>
-    </div>
-        
+    </div>    
+
+    <!-- Market trading -->
     <div class="p-md-2">
         <p-tabView styleClass="tabview-custom" [(activeIndex)]="indexTrade" (onChange)="onTabTradeChange($event)">
             <p-tabPanel>
@@ -115,5 +127,30 @@
                     [disabled]="(!tradeBuyFormGroup.valid && indexTrade == 0) || (!tradeSellFormGroup.valid && indexTrade == 1)"
                     (click)="onExecuteTradeClick($event)"></button>            
         </div>
+    </div>
+</div>
+
+<!-- Market charts -->
+<div class="p-d-flex">    
+    <div class="p-md-12">
+        <p-card header="Market Trades" >                
+        </p-card>
+
+        <p-card [style]="{height: '460px', overflow: 'auto'}">
+            <div class="p-d-flex">
+                <div class="p-md-6">       
+                    <p-chart type="doughnut" 
+                             [data]="energyTotal" 
+                             [options]="energyTotalOptions">
+                    </p-chart>
+                </div>
+                <div class="p-md-6">
+                    <p-chart type="doughnut" 
+                             [data]="priceTotal" 
+                             [options]="priceTotalOptions">
+                    </p-chart>
+                </div>
+            </div>            
+        </p-card>
     </div>
 </div>

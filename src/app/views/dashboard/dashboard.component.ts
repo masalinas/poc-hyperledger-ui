@@ -27,6 +27,10 @@ export class DashboardComponent implements OnInit {
   public actionColor: string = "Green";
   public tradesBuy: Trade[];
   public tradesSell: Trade[];
+  public energyTotalOptions: any;
+  public energyTotal: any;
+  public priceTotalOptions: any;
+  public priceTotal: any;
 
   public tradeSellFormGroup = this.fb.group({
     owner: [''],
@@ -62,15 +66,102 @@ export class DashboardComponent implements OnInit {
 
       console.log (trades);
       
+      // filter and sort buy trades
       this.tradesBuy = this.trades.filter(trade => trade.tradeType === 'Buy'); 
       this.tradesBuy.sort((a, b) => {
         return  b.price - a.price || new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime()
       });
 
+      // filter and sort sell trades
       this.tradesSell = this.trades.filter(trade => trade.tradeType === 'Sell');
       this.tradesSell.sort((a, b) => {
         return  a.price - b.price || new Date(a.creationDate).getTime() - new Date(b.creationDate).getTime()
       });
+
+      // calculate energy trades
+      let totalBuyEnergy: number = 0;
+      let totalBuyPrice: number = 0;
+      this.tradesBuy.forEach(trade => {
+        totalBuyEnergy = totalBuyEnergy + trade.value;        
+        totalBuyPrice = Math.round(totalBuyPrice + (trade.value * trade.price));
+      });
+
+      let totalSellEnergy: number = 0;
+      let totalSellPrice: number= 0;
+      this.tradesSell.forEach(trade => {
+        totalSellEnergy = totalSellEnergy + trade.value;
+        totalSellPrice = Math.round(totalSellPrice + (trade.value * trade.price));
+      });
+
+      this.energyTotalOptions = {
+        title: {
+          display: true,
+          text: 'Energy Market',
+          fontSize: 16
+        },
+        tooltips: {
+          callbacks: {
+              label: function(tooltipItem, data) {
+                  return data.labels[tooltipItem.index] + ': ' + data.datasets[0].data[tooltipItem.index] + ' Kw';
+              }
+            }
+        }
+      }
+
+      this.energyTotal = {
+        labels: ['Buy','Sell'],
+        datasets: [
+            {
+                data: [totalBuyEnergy, totalSellEnergy],
+                backgroundColor: [
+                    "green",
+                    "red"
+                ],
+                hoverBackgroundColor: [
+                    "green",
+                    "red"
+                ]
+            }
+        ]  
+      };
+      
+      this.priceTotalOptions = {
+        title: {
+          display: true,
+          text: 'Price Market',
+          fontSize: 16
+        },
+        tooltips: {
+          callbacks: {
+              label: function(tooltipItem, data) {
+                  return data.labels[tooltipItem.index] + ': ' + data.datasets[0].data[tooltipItem.index] + ' €';
+              }
+            }
+        }  
+      }
+
+      this.priceTotal = {
+        labels: ['Buy','Sell'],
+        options: {
+          title: {
+              display: true,
+              text: 'Chart.js Doughnut Chart'
+            }
+        },
+        datasets: [
+            {
+                data: [totalBuyPrice, totalSellPrice],
+                backgroundColor: [
+                    "green",
+                    "red"
+                ],
+                hoverBackgroundColor: [
+                    "green",
+                    "red"
+                ]
+            }
+        ]    
+      };
     },
     err => {
       this.loading = false;
